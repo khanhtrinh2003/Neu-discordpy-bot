@@ -16,7 +16,7 @@ def news(x, nums):
             li.append([tit, link])
         return np.array(li).reshape(-1,1)
 
-    elif x == "Economics":
+    elif x == "Kinh tế":
         cafebiz_request = requests.get("https://cafebiz.vn/vi-mo.chn")
         cafebiz = BeautifulSoup(cafebiz_request.content, "html.parser")
         news = cafebiz.findAll('div', class_='cfbiznews_box')
@@ -27,6 +27,21 @@ def news(x, nums):
             a = new.find('a').attrs["href"]
             link = 'https://cafebiz.vn'+a
             li.append([tit, link])
-        return np.array(li).reshape(-1,1)   
+        return np.array(li).reshape(-1,1) 
+
+    elif x == "Economics":
+        trd_request = requests.get("https://vn.tradingview.com/news/")
+        trd = BeautifulSoup(trd_request.content, "html.parser")
+        news = trd.findAll('a', class_='card-gaCYEutU cardLink-gaCYEutU')
+        # ti = trd.findAll('span', class_='title-C9RvkKmg')
+
+        li=[]
+        for i in range(nums):
+            # title = ti[i].text
+            a=news[i].attrs["href"]
+            link = 'https://vn.tradingview.com'+a
+            li.append([link])
+
+        return np.array(li).reshape(-1,1)         
 
  

@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 import typing
 from typing import List
-
+import matplotlib.pyplot as plt
 #import module
 sys.path.append("Data_handling")
 from Data_handling.tkb22_23 import room, hoc_ke
@@ -12,7 +12,10 @@ sys.path.append("Notification")
 from Notification import Noti
 
 import game
-TOKEN = '' # Put toke in here
+
+from game_theo import Game_theo
+
+TOKEN = 'MTAwNzU0MTQ4MzQ3NTMxNjgxNw.GT63Ae.2Xwqs82L3E4OZE5wz36DDdhbthprBHV_Zp5uQY' # Put toke in here
 
 class abot(discord.Client):
     def __init__(self):
@@ -26,6 +29,31 @@ class abot(discord.Client):
 
 bot = abot()
 tree = app_commands.CommandTree(bot)
+
+with open("vn_offensive_words.txt",encoding="utf8") as f:
+    words = f.read().splitlines()
+
+@bot.event
+async def on_message(message):
+
+    if message.author == bot.user:
+        pass       
+
+    ms = message.content.lower().split(" ") 
+    member = f'<@{message.author.id}>'
+    nt = []
+    if message.author.id != 1007541483475316817:
+        for i in words:
+            if i in message.content.lower():
+                nt.append(i)
+        for i in ms:
+            if i in words:
+                if i not in nt:
+                    nt.append(i)
+        if len(nt) != 0:
+            await message.channel.send(f"Phát hiện những từ thô lỗ: {list(set(nt))}\nMẹ biết mẹ buồn đấy {member} <:emoji_26:985828937177378836>, đừng nói những từ thô tục với nhau như thế<:emoji_19:931190200120512582> ")
+                
+
 
 # Feature 1
 @tree.command(
@@ -130,7 +158,8 @@ async def ke(
 @app_commands.choices(
     thong_tin = [
         app_commands.Choice(name="NEU", value="NEU"),
-        app_commands.Choice(name="Kinh tế", value="Economics"),
+        app_commands.Choice(name="Kinh tế", value="Kinh tế"),
+        app_commands.Choice(name="Economics", value="Economics"),
         ],
     )
 
@@ -155,24 +184,27 @@ async def self(interaction: discord.Interaction, num: int):
 
 # Feature 6
 @tree.command(
-    name='keo_bua_bao', 
-    description='Trò chơi', 
+    name='chien_luoc_nguoi_2', 
+    description='Chiến lược tối ưu cho người 2', 
     guild=discord.Object(id="919927035558764574")
     )
 
-@app_commands.choices(
-    chien_luoc = [
-        app_commands.Choice(name="Búa", value=0),
-        app_commands.Choice(name="Kéo", value=1),
-        app_commands.Choice(name="Bao", value=2),
-        ],
-    )
+@app_commands.describe(p1="Chọn chiến lược cho người 1", p2="Chọn chiến lược cho người 2")
+async def self(interaction: discord.Interaction, p1: float, p2: float):
+    await interaction.response.send_message(Game_theo(p1, p2).chien_luoc())
+    image = discord.File("test.png")
+    Game_theo(p1, p2).minh_hoa()
+    plt.savefig("test.png")
+    plt.close()
+    await interaction.channel.send(file=image)
 
-@app_commands.describe(chien_luoc="Chọn chiến lược")
+    image1 = discord.File("test1.png")
+    Game_theo(p1, p2).mat_do_loi_nhuan()
+    plt.savefig("test1.png")
+    plt.close()
+    await interaction.channel.send(file=image1)
 
-async def self(interaction: discord.Interaction, chien_luoc: app_commands.Choice[int], reset: typing.Optional[bool]=False):
-    await interaction.response.send_message('......', ephemeral=True, delete_after=0.000000000000000000000000000000001)
-    await interaction.channel.send(game.Game_theory(chien_luoc.value, reset).play())
+
 
 # Help
 @tree.command(
