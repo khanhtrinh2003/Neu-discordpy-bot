@@ -15,15 +15,15 @@ import game
 
 from game_theo import Game_theo
 
-TOKEN = 'MTAwNzU0MTQ4MzQ3NTMxNjgxNw.GT63Ae.2Xwqs82L3E4OZE5wz36DDdhbthprBHV_Zp5uQY' # Put toke in here
-
+TOKEN = '' # Put toke in here
+ServerID = ""# Put toke in here
 class abot(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.all())
         self.synced = False
 
     async def on_ready(self):
-        await tree.sync(guild=discord.Object(id="919927035558764574"))
+        await tree.sync(guild=discord.Object(id=ServerID))
         self.synced = True
         print('Bot has connected to Discord!')
 
@@ -59,7 +59,7 @@ async def on_message(message):
 @tree.command(
     name='confess', 
     description='Nhắn tin ẩn danh', 
-    guild=discord.Object(id="919927035558764574")
+    guild=discord.Object(id=ServerID)
     )
 
 @app_commands.describe(message='Nhập tin nhắn', file='Gửi hình hoặc file')
@@ -152,7 +152,7 @@ async def ke(
 @tree.command(
     name='thongbao', 
     description='Thông báo', 
-    guild=discord.Object(id="919927035558764574")
+    guild=discord.Object(id=ServerID)
     )
 
 @app_commands.choices(
@@ -173,7 +173,7 @@ async def news(interaction: discord.Interaction, thong_tin : app_commands.Choice
 @tree.command(
     name='guess', 
     description='Đoán số nằm trong khoản 0->100', 
-    guild=discord.Object(id="919927035558764574")
+    guild=discord.Object(id=ServerID)
     )
 
 @app_commands.describe(num="Nhập số")
@@ -186,7 +186,7 @@ async def self(interaction: discord.Interaction, num: int):
 @tree.command(
     name='chien_luoc_nguoi_2', 
     description='Chiến lược tối ưu cho người 2', 
-    guild=discord.Object(id="919927035558764574")
+    guild=discord.Object(id=ServerID)
     )
 
 @app_commands.describe(p1="Chọn chiến lược cho người 1", p2="Chọn chiến lược cho người 2")
@@ -210,7 +210,7 @@ async def self(interaction: discord.Interaction, p1: float, p2: float):
 @tree.command(
     name='help', 
     description='Trợ giúp', 
-    guild=discord.Object(id="919927035558764574")
+    guild=discord.Object(id=ServerID)
     )
 
 async def help(interaction: discord.Interaction):
