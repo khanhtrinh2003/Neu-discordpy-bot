@@ -15,8 +15,9 @@ import game
 
 from game_theo import Game_theo
 
-TOKEN = '' # Put toke in here
-ServerID = ""# Put toke in here
+TOKEN = 'MTAwNzU0MTQ4MzQ3NTMxNjgxNw.Gjvycv.-cNbwVQ8cWwsG4aqCGqg7B9WjFt0Ox1Pym2_jQ' # Put toke in here
+ServerID = "919927035558764574"# Put toke in here
+
 class abot(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.all())
@@ -30,7 +31,7 @@ class abot(discord.Client):
 bot = abot()
 tree = app_commands.CommandTree(bot)
 
-with open("vn_offensive_words.txt",encoding="utf8") as f:
+with open("Bad word detection/vn_offensive_words.txt",encoding="utf8") as f:
     words = f.read().splitlines()
 
 @bot.event

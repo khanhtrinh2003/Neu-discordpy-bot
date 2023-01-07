@@ -42,14 +42,13 @@ class ve_do_thi():
         self.p1=p1
     
     def chien_luoc(self):
-        b = Infor(self.p1,ve_do_thi.p20)
         if self.p1<0.5:
-            e = 1
+            e = "p2=1"
         elif self.p1>0.5:
-            e = 0
+            e = "p2=0"
         else:
             e = "Bất kể chiến lược nào cũng được"
-        return (f"Người 1: {self.p1}\nNgười 2: {e}")
+        return (f"Người 1: {self.p1}\nChiến lược tối ưu cho người 2: {e}")
         
     def minh_hoa(self):
         fig = plt.figure()
@@ -67,8 +66,8 @@ class ve_do_thi():
         plt.scatter(c.Var(), c.ER(), color="yellow")
         plt.scatter(d.Var(), d.ER(), color="red")
         plt.scatter(e.Var(), e.ER(), color="green")
-        plt.xlabel("var(p2S2+(1-p2)S2)")
-        plt.ylabel("E(p2S2+(1-p2)S2)")
+        plt.xlabel("var(p\u2082S\u2082+(1-p\u2082)S\u2082)")
+        plt.ylabel("E(p\u2082S\u2082+(1-p\u2082)S\u2082)")
         return fig
 
 class Kiem_dinh():
@@ -79,37 +78,34 @@ class Kiem_dinh():
     def mat_do_loi_nhuan(self):
         u1 =[]
         u2 = []
+        u3 = []
         for i in range(1000):
             n1 = random.choices(Peo1, weights=[self.p1,1-self.p1], k=1000)
             n2 = random.choices(Peo2, weights=[self.p2,1-self.p2], k=1000)
             s1 = list(map(encode, n1))
             s2 = list(map(encode, n2))
+            s3 = [1]*1000
+            s4 = [0]*1000
 
             chien_luoc = list(map(to_li,list(zip(s1,s2))))
+            chien_luoc1 = list(map(to_li,list(zip(s1,s3))))
+            chien_luoc2 = list(map(to_li,list(zip(s1,s4))))
             u1.append(sum(list(map(thu_hoach2, chien_luoc))))
-        n2 = []
-        s2 = []
-        if self.p1 >0.5:
-            for i in range(1000):
-                n1 = random.choices(Peo1, weights=[self.p1,1-self.p1], k=1000)
-                n2 = random.choices(Peo2, weights=[0,1], k=1000)
-                s2 = list(map(encode, n2))
-                s1 = list(map(encode, n1))
-                chien_luoc = list(map(to_li,list(zip(s1,s2))))
-                u2.append(sum(list(map(thu_hoach2, chien_luoc))))              
+            u2.append(sum(list(map(thu_hoach2, chien_luoc1))))
+            u3.append(sum(list(map(thu_hoach2, chien_luoc2))))
         
-        elif self.p1 <=0.5:
-            for i in range(1000):
-                n1 = random.choices(Peo1, weights=[self.p1,1-self.p1], k=1000)
-                n2 = random.choices(Peo2, weights=[1,0], k=1000)
-                s2 = list(map(encode, n2))
-                s1 = list(map(encode, n1))
-                chien_luoc = list(map(to_li,list(zip(s1,s2))))
-                u2.append(sum(list(map(thu_hoach2, chien_luoc))))              
-        u = pd.DataFrame({"Chiến lược bạn chọn": u1,"Chiến lược tối ưu": u2})
+        u = pd.DataFrame({"Chiến lược bạn chọn": u1,"Chiến lược tối ưu": u2,"Chiến lược tối ưu ": u3})
+        
         fig, ax = plt.subplots(1,1)
-        for s in u.columns:
-            u[s].plot(kind='density')
+               
+        if self.p1 <= 0.5:
+            u["Chiến lược bạn chọn"].plot(kind='density')
+            u["Chiến lược tối ưu "].plot(kind='density')
+            
+        else:
+            u["Chiến lược bạn chọn"].plot(kind='density')
+            u["Chiến lược tối ưu"].plot(kind='density')
+
         plt.legend()
         plt.xlabel("Số tiền nhận được")
         return fig
@@ -118,3 +114,4 @@ class Kiem_dinh():
 class Game_theo(Infor, ve_do_thi, Kiem_dinh):
     def __init__(self, p1, p2):
         super().__init__(p1, p2)
+
