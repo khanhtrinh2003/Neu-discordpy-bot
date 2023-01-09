@@ -4,18 +4,16 @@ from discord import app_commands
 import typing
 from typing import List
 import matplotlib.pyplot as plt
+
+
 #import module
-sys.path.append("Data_handling")
+
 from Data_handling.tkb22_23 import room, hoc_ke
+from Notification.noti import news
+from Game.game import Game_theo, DoanSo
+from Chatbot.chatbot import AI_BOT
 
-sys.path.append("Notification")
-from Notification import Noti
-
-import game
-
-from game_theo import Game_theo
-
-TOKEN = 'MTAwNzU0MTQ4MzQ3NTMxNjgxNw.Gjvycv.-cNbwVQ8cWwsG4aqCGqg7B9WjFt0Ox1Pym2_jQ' # Put toke in here
+TOKEN = '' # Put toke in here
 ServerID = "919927035558764574"# Put toke in here
 
 class abot(discord.Client):
@@ -31,30 +29,14 @@ class abot(discord.Client):
 bot = abot()
 tree = app_commands.CommandTree(bot)
 
-with open("Bad word detection/vn_offensive_words.txt",encoding="utf8") as f:
-    words = f.read().splitlines()
-
 @bot.event
 async def on_message(message):
-
     if message.author == bot.user:
-        pass       
-
-    ms = message.content.lower().split(" ") 
-    member = f'<@{message.author.id}>'
-    nt = []
-    if message.author.id != 1007541483475316817:
-        for i in words:
-            if i in message.content.lower():
-                nt.append(i)
-        for i in ms:
-            if i in words:
-                if i not in nt:
-                    nt.append(i)
-        if len(nt) != 0:
-            await message.channel.send(f"Phát hiện những từ thô lỗ: {list(set(nt))}\nMẹ biết mẹ buồn đấy {member} <:emoji_26:985828937177378836>, đừng nói những từ thô tục với nhau như thế<:emoji_19:931190200120512582> ")
-                
-
+        return
+    
+    channel = ["chatbot", "testbot"]
+    if message.channel.name in channel :
+        await message.channel.send(AI_BOT(message.content))       
 
 # Feature 1
 @tree.command(
@@ -168,7 +150,7 @@ async def ke(
 
 async def news(interaction: discord.Interaction, thong_tin : app_commands.Choice[str], num: int):
     await interaction.response.send_message('......', ephemeral=True, delete_after=0.000000000000000000000000000000001)
-    await interaction.channel.send(Noti.news(thong_tin.value, num))
+    await interaction.channel.send(news(thong_tin.value, num))
 
 # Feature 5
 @tree.command(
@@ -181,7 +163,7 @@ async def news(interaction: discord.Interaction, thong_tin : app_commands.Choice
 
 async def self(interaction: discord.Interaction, num: int):
     await interaction.response.send_message('......', ephemeral=True, delete_after=0.000000000000000000000000000000001)
-    await interaction.channel.send(game.DoanSo(num).play())
+    await interaction.channel.send(DoanSo(num).play())
 
 # Feature 6
 @tree.command(
@@ -226,5 +208,24 @@ async def help(interaction: discord.Interaction):
     embedIn.add_field(name="6) '/keo_bua_bao'", value="Chơi kéo búa bao", inline=False)
     embedIn.set_footer(text="Have a good day :)))")
     await interaction.response.send_message(embed = embedIn)
+
+def generate_response(prompt, temperature):
+    completions = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=4000, # 4000 is the maximum number of tokens for the davinci 003 GPT3 model
+        n=1,
+        stop=None,
+        temperature=temperature,
+    )
+
+    if 'error' in completions:
+        return completions['error']['message']
+    else:
+        message = completions.choices[0].text
+    if '!image' in prompt:
+        return message
+    else:
+        return message
 
 bot.run(TOKEN)
