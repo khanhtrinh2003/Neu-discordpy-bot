@@ -1,26 +1,36 @@
+import random
 import numpy as np
 import matplotlib.pyplot as plt
-import random
-import seaborn as sns
 import pandas as pd
 
 Peo1 = ["S1", "N1"]
 Peo2 = ["S2", "N2"]
 payoff2 = [[-1, 1],[1, -1]]
 
-def encode(s):
-    if s == "N1" or s == "N2":
-        return 1
-    else:
-        return 0
+#Game Doan so
+class DoanSo():
+    l = []
+    buoc = 0
 
-def to_li(e):
-    return list(e)
+    def __init__(self, s):
+        self.s = s  
+        DoanSo.l.append(random.randint(1, 100))
+        DoanSo.buoc += 1
+        
+    def play(self):  
 
-def thu_hoach2(s):
-    return payoff2[s[0]][s[1]]
+        if self.s == DoanSo.l[0]:
+            DoanSo.l=[]
+            a = DoanSo.buoc
+            DoanSo.buoc = 0
+            return (f'CHÚC MỪNG BẠN ĐÃ ĐOÁN ĐÚNG SỐ{self.s} sau {a} bước')
 
+        elif self.s > DoanSo.l[0]:
+            return (f'SỐ ĐÓ BÉ HƠN {self.s}')
+        else:
+            return (f'SỐ ĐÓ LỚN HƠN {self.s}')
 
+# Game theory
 class Infor():
     def __init__(self, p1, p2):
         self.p1 = p1
@@ -115,3 +125,14 @@ class Game_theo(Infor, ve_do_thi, Kiem_dinh):
     def __init__(self, p1, p2):
         super().__init__(p1, p2)
 
+def encode(s):
+    if s == "N1" or s == "N2":
+        return 1
+    else:
+        return 0
+
+def to_li(e):
+    return list(e)
+
+def thu_hoach2(s):
+    return payoff2[s[0]][s[1]]
