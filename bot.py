@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 
 #import module
 
-from Data_handling.tkb22_23 import room, hoc_ke
+from Schedule.tkb22_23 import room, hoc_ke
 from Notification.noti import news
 from Game.game import Game_theo, DoanSo
-from Chatbot.chatbot import AI_BOT
+from Chatbot.chatbot import AI_BOT, Code, Image, Chat
 
 TOKEN = '' # Put toke in here
-ServerID = "919927035558764574"# Put toke in here
+ServerID = "919927035558764574"# Put serverid
 
 class abot(discord.Client):
     def __init__(self):
@@ -21,7 +21,7 @@ class abot(discord.Client):
         self.synced = False
 
     async def on_ready(self):
-        await tree.sync(guild=discord.Object(id=ServerID))
+        await tree.sync()
         self.synced = True
         print('Bot has connected to Discord!')
 
@@ -40,23 +40,23 @@ async def on_message(message):
 # Feature 1
 @tree.command(
     name='confess', 
-    description='Nhắn tin ẩn danh', 
-    guild=discord.Object(id=ServerID)
+    description='Nhắn tin ẩn danh',
     )
 
 @app_commands.describe(message='Nhập tin nhắn', file='Gửi hình hoặc file')
 
-async def confess(interaction: discord.Interaction, message: str, file: typing.Optional[discord.Attachment]):
-    await interaction.response.send_message('......', ephemeral=True, delete_after=0.000000000000000000000000000000001)
-    await interaction.channel.send(f'{message}')
-    await interaction.channel.send(file)
+async def confess(interaction: discord.Interaction, message: str, file: typing.Optional[discord.Attachment]):    
+    if interaction.guild.id in ServerID:
+        await interaction.response.send_message('......', ephemeral=True, delete_after=0.000000000000000000000000000000001)
+        await interaction.channel.send(f'{message}')
+        await interaction.channel.send(file)
 
     
 # Feature 2
 @tree.command(
     name='tim_phong', 
     description='Tìm phòng ở NEU',
-    guild=discord.Object(id=919927035558764574)
+    
     )
 
 @app_commands.describe(
@@ -104,16 +104,16 @@ async def timphong(
     building: app_commands.Choice[str], 
     floors: app_commands.Choice[str]
     ):
-
-    res = room(days.value, period.value, building.value, floors.value)
-    embedVar = discord.Embed(title="Các phòng có người học", description=res, color=0x15E3E0)
-    await interaction.response.send_message(embed=embedVar, ephemeral=True)    
+    if interaction.guild.id in ServerID:
+        res = room(days.value, period.value, building.value, floors.value)
+        embedVar = discord.Embed(title="Các phòng có người học", description=res, color=0x15E3E0)
+        await interaction.response.send_message(embed=embedVar, ephemeral=True)    
 
 # Feature 3
 @tree.command(
     name='hoc_ke', 
     description='Học ké ở NEU',
-    guild=discord.Object(id=919927035558764574)
+    
     )
 
 @app_commands.describe()
@@ -134,7 +134,7 @@ async def ke(
 @tree.command(
     name='thongbao', 
     description='Thông báo', 
-    guild=discord.Object(id=ServerID)
+    
     )
 
 @app_commands.choices(
@@ -155,7 +155,7 @@ async def news(interaction: discord.Interaction, thong_tin : app_commands.Choice
 @tree.command(
     name='guess', 
     description='Đoán số nằm trong khoản 0->100', 
-    guild=discord.Object(id=ServerID)
+    
     )
 
 @app_commands.describe(num="Nhập số")
@@ -166,65 +166,58 @@ async def self(interaction: discord.Interaction, num: int):
 
 # Feature 6
 @tree.command(
-    name='chien_luoc_nguoi_2', 
-    description='Chiến lược tối ưu cho người 2', 
-    guild=discord.Object(id=ServerID)
+    name='chien_luoc', 
+    description='Chiến lược', 
+    
     )
 
-@app_commands.describe(p1="Chọn chiến lược cho người 1", p2="Chọn chiến lược cho người 2")
-async def self(interaction: discord.Interaction, p1: float, p2: float):
-    await interaction.response.send_message(Game_theo(p1, p2).chien_luoc())
-    image = discord.File("test.png")
-    Game_theo(p1, p2).minh_hoa()
-    plt.savefig("test.png")
-    plt.close()
-    await interaction.channel.send(file=image)
+@app_commands.describe(p="Chọn chiến lược")
+async def self(interaction: discord.Interaction, p: float):
+    rep = Game_theo(p,interaction.user).mat_do_loi_nhuan()
 
-    image1 = discord.File("test1.png")
-    Game_theo(p1, p2).mat_do_loi_nhuan()
-    plt.savefig("test1.png")
-    plt.close()
-    await interaction.channel.send(file=image1)
+    if rep=="Đã ghi nhận dữ liệu":
+        await interaction.response.send_message(f"Đã ghi nhận dữ liệu của {interaction.user}")
+    else:
+        with open("test.png", "rb") as fh:
+            await interaction.response.send_message(file = discord.File(fh, filename="test.png"))
 
-
-
-# Help
+# Feature 7
 @tree.command(
-    name='help', 
-    description='Trợ giúp', 
-    guild=discord.Object(id=ServerID)
+    name='code', 
+    description='Giải đáp về code', 
+    
     )
 
-async def help(interaction: discord.Interaction):
-    embedIn = discord.Embed(title="Welcome To BOTO", description="**Commands:**", color=0x00eeff)
-    embedIn.set_author(name="From KT with luv <3", icon_url="")
-    embedIn.set_thumbnail(url="https://cdn.discordapp.com/emojis/754600266288070806.png?v=1")
-    embedIn.add_field(name="1) '/confess'", value="Nhắn tin ẩn danh", inline=False)
-    embedIn.add_field(name="2) '/tim_phong'", value="Tìm các phòng trống ở NEU", inline=False)
-    embedIn.add_field(name="3) '/hoc_ke'", value="Học ké NEU", inline=False)
-    embedIn.add_field(name="4) '/thongbao'", value="Lấy thông báo", inline=False)
-    embedIn.add_field(name="5) '/guess'", value="Chơi đoán số", inline=False)
-    embedIn.add_field(name="6) '/keo_bua_bao'", value="Chơi kéo búa bao", inline=False)
-    embedIn.set_footer(text="Have a good day :)))")
-    await interaction.response.send_message(embed = embedIn)
+@app_commands.describe(tin_nhan="Nhập tin nhắn")
 
-def generate_response(prompt, temperature):
-    completions = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=4000, # 4000 is the maximum number of tokens for the davinci 003 GPT3 model
-        n=1,
-        stop=None,
-        temperature=temperature,
+async def self(interaction: discord.Interaction, tin_nhan: str):
+    await interaction.response.send_message(tin_nhan, ephemeral=True) 
+    await interaction.channel.send(Code(tin_nhan))
+
+# Feature 7
+@tree.command(
+    name='image', 
+    description='Hình ảnh', 
+    
     )
 
-    if 'error' in completions:
-        return completions['error']['message']
-    else:
-        message = completions.choices[0].text
-    if '!image' in prompt:
-        return message
-    else:
-        return message
+@app_commands.describe(tin_nhan="Nhập tin nhắn")
+
+async def self(interaction: discord.Interaction, tin_nhan: str):
+    await interaction.response.send_message(tin_nhan, ephemeral=True) 
+    await interaction.channel.send(Image(tin_nhan))
+
+# Feature 8
+@tree.command(
+    name='chat', 
+    description='Chat với Bot', 
+    
+    )
+
+@app_commands.describe(tin_nhan="Nhập tin nhắn")
+
+async def self(interaction: discord.Interaction, tin_nhan: str):
+    await interaction.response.send_message(tin_nhan, ephemeral=True)    
+    await interaction.channel.send(Chat(tin_nhan))
 
 bot.run(TOKEN)
